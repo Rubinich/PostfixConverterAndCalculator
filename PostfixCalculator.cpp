@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stack>
 #include <string> //for stod() -> converts string to double
-using namespace std;
 
 int priority(char c) {
     if (c == '*' || c == '/')
@@ -24,9 +23,9 @@ double performOperation(double a, double b, char operation) {
     }
 }
 
-string infixToPostfix(string infix) {
-    stack<char> operations;
-    string postfix;
+std::string infixToPostfix(std::string infix) {
+    std::stack<char> operations;
+    std::string postfix;
     for (int i = 0; i < infix.length(); i++) {
         char c = infix[i];
         if (isdigit(c)) {
@@ -69,11 +68,11 @@ string infixToPostfix(string infix) {
     return postfix;
 }
 
-double postfixEvaluation(string postfix) {
-    stack<double> numbers;
+double postfixEvaluation(std::string postfix) {
+    std::stack<double> numbers;
     for (int i = 0; i < postfix.length(); i++) {
         if (isdigit(postfix[i])) {
-            string number;
+            std::string number;
             //checking for multi-digit numbers
             while (i < postfix.length() && isdigit(postfix[i])) {
                 number += postfix[i];
@@ -99,11 +98,11 @@ double postfixEvaluation(string postfix) {
 }
 
 int main() {
-    string infix;
-    cout << "Enter infix: ";
-    cin >> infix;
-    string postfix = infixToPostfix(infix);
-    cout << "Postfix: " << postfix << endl;
-    cout << "Solution: " << postfixEvaluation(postfix) << endl;
+    std::string infix;
+    std::cout << "Enter infix: ";
+    std::cin >> infix;
+    std::string postfix = infixToPostfix(infix);
+    std::cout << "Postfix: " << postfix << std::endl;
+    std::cout << "Solution: " << postfixEvaluation(postfix) << std::endl;
     return 0;
 }
