@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stack>
+#include <string> //for stod() -> converts string to double
 using namespace std;
 
 int priority(char c) {
@@ -10,33 +11,46 @@ int priority(char c) {
     return 0;
 }
 
-string InfixToPostfix(string infix) {
+double performOperation(double a, double b, char operation) {
+    switch (operation) {
+    case '+':
+        return (a + b);
+    case '-':
+        return (a - b);
+    case '*':
+        return (a * b);
+    case '/':
+        return (a / b);
+    }
+}
+
+string infixToPostfix(string infix) {
     stack<char> operations;
     string postfix;
     for (int i = 0; i < infix.length(); i++) {
         char c = infix[i];
         if (isdigit(c)) {
             postfix += c;
-            // if the next number is operation make a whitespace
+            // if the next number is operation make a whitespace -> esthetic output
             if (isdigit(c) != isdigit(infix[i+1]))
                 postfix += ' ';
         }
         else if (c == '(')
             operations.push(c);
         else if (c == ')') {
-            /* if we reach ')' we have to save and pop all operations
-            sorted by priority*/
+            /* if we reach ')' we have to save all operators to operators stack till '('*/
             while (!operations.empty() && operations.top() != '(') {
                 postfix += operations.top();
                 postfix += ' ';
                 operations.pop();
             }
+            //removes ')'
             operations.pop();
         }
         else {
             /*if the character in stack has higher priroity than the character in
-            infix we have to save them and pop all the characters with highter of
-            equal priroty*/
+            infix we have to save operations and pop them till we reach operation in stack
+            that's smaller that infix operation*/
             while (!operations.empty() && priority(c) <= priority(operations.top())) {
                 postfix += operations.top();
                 postfix += ' ';
@@ -55,30 +69,30 @@ string InfixToPostfix(string infix) {
     return postfix;
 }
 
-double PostfixEvaluation(string postfix) {
-    stack<int> numbers;
-    for (int i = 0; i < postfix.length();) {
-        char  c = postfix[i];
-        if (isdigit(c)) {
-            numbers.push(c - '0');
-            i++;
-        }
-        else if (c == ' ')
-            i++;
-        else {
-            // second number
-            int b = numbers.top();
-            numbers.pop();
-            // first number
-            int a = numbers.top();
-            numbers.pop();
-            switch (c) {
-            case '+': numbers.push(a + b); break;
-            case '-': numbers.push(a - b); break;
-            case '*': numbers.push(a * b); break;
-            case '/': numbers.push(a / b); break;
+double postfixEvaluation(string postfix) {
+    stack<double> numbers;
+    for (int i = 0; i < postfix.length(); i++) {
+        if (isdigit(postfix[i])) {
+            string number;
+            //checking for multi-digit numbers
+            while (i < postfix.length() && isdigit(postfix[i])) {
+                number += postfix[i];
+                i++;
             }
-            i++;
+            //removes the values of i by 1 that was added in while -> postfix[i] isn't a number any more
+            i--;
+            numbers.push(stod(number));
+        }
+        else if (postfix[i] == ' ') {
+            continue;
+        }
+        else {
+            double b = numbers.top();
+            numbers.pop();
+            double a = numbers.top();
+            numbers.pop();
+            char operation = postfix[i];
+            numbers.push(performOperation(a, b, operation));
         }
     }
     return numbers.top();
@@ -88,8 +102,8 @@ int main() {
     string infix;
     cout << "Enter infix: ";
     cin >> infix;
-    string postfix = InfixToPostfix(infix);
+    string postfix = infixToPostfix(infix);
     cout << "Postfix: " << postfix << endl;
-    cout << "Solution: " << PostfixEvaluation(postfix) << endl;
+    cout << "Solution: " << postfixEvaluation(postfix) << endl;
     return 0;
 }
